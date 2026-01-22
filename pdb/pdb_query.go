@@ -1,30 +1,31 @@
-package pdb
+﻿package pdb
 
 import (
-	"github.com/gin-gonic/gin"
 	"os"
 	"path"
 	"pdb_proxy/conf"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func PdbQuery(c *gin.Context) {
-	pdbName := c.Param("pdbname")
-	pdbHash := c.Param("pdbhash")
+func PdbQuery(c *fiber.Ctx) error {
+	pdbName := c.Params("pdbname")
+	pdbHash := c.Params("pdbhash")
 	pdbQuery := pdbName + "/" + pdbHash + "/" + pdbName
 	pdbPath := path.Join(conf.PdbDir, pdbQuery)
 	//log.Printf("Pdb Path: %s", pdbPath)
 
 	_, err := os.Stat(pdbPath)
 	if err == nil {
-		c.File(pdbPath)
+		return c.SendFile(pdbPath)
 	} else {
 		pdbUrl := conf.PdbServer + "/" + pdbQuery
 		err := DownLoadFile(pdbUrl, pdbPath)
 		if err != nil {
 			os.Remove(pdbPath)
-			c.String(404, "")
+			return c.Status(404).SendString("")
 		} else {
-			c.File(pdbPath)
+			return c.SendFile(pdbPath)
 		}
 	}
 

@@ -1,4 +1,4 @@
-package conf
+﻿package conf
 
 import (
 	"os"
@@ -12,7 +12,7 @@ var (
 
 func init() {
 
-	PdbDir = GetStrEnvWithDefault("PDB_DIR", "/pdb")
+	PdbDir = GetStrEnvWithDefault("PDB_DIR", defaultPdbDir())
 	PdbServer = GetStrEnvWithDefault("PDB_SERVER", "https://msdl.microsoft.com/download/symbols")
 	ServerPort = GetStrEnvWithDefault("SERVER_PORT", "0.0.0.0:9000")
 }

@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -8,32 +8,32 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
-
 	// 打印启动信息
 	printStartupInfo()
 
-	r := gin.Default()
+	app := fiber.New()
+	app.Use(recover.New())
 
 	// 添加根路径处理器，为浏览器访问提供友好界面
-	r.GET("/", handleRootAccess)
+	app.Get("/", handleRootAccess)
 
 	// 原有的pdb查询路由
-	r.GET("/download/symbols/:pdbname/:pdbhash/:pdbname", pdb.PdbQuery)
+	app.Get("/download/symbols/:pdbname/:pdbhash/:pdbname", pdb.PdbQuery)
 
 	// 处理其他404情况，如果是浏览器访问则返回友好页面
-	r.NoRoute(handleNotFound)
+	app.Use(handleNotFound)
 
 	// 打印服务器启动完成信息
 	fmt.Printf("🚀 服务器启动完成！访问 http://%s 获取配置说明\n", conf.ServerPort)
 	fmt.Println("📝 按 Ctrl+C 停止服务器")
 	fmt.Println(strings.Repeat("=", 60))
 
-	r.Run(conf.ServerPort)
+	app.Listen(conf.ServerPort)
 }
 
 // printStartupInfo 打印启动信息
@@ -53,31 +53,31 @@ func printStartupInfo() {
 }
 
 // handleRootAccess 处理根路径访问
-func handleRootAccess(c *gin.Context) {
+func handleRootAccess(c *fiber.Ctx) error {
 	// 检查是否为浏览器访问
 	if isBrowserRequest(c) {
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		c.String(http.StatusOK, getHelpHTML())
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.Status(http.StatusOK).SendString(getHelpHTML())
 	} else {
-		c.String(http.StatusNotFound, "PDB Proxy Server - Use /download/symbols/[pdbname]/[pdbhash]/[pdbname] for PDB files")
+		return c.Status(http.StatusNotFound).SendString("PDB Proxy Server - Use /download/symbols/[pdbname]/[pdbhash]/[pdbname] for PDB files")
 	}
 }
 
 // handleNotFound 处理404情况
-func handleNotFound(c *gin.Context) {
+func handleNotFound(c *fiber.Ctx) error {
 	// 检查是否为浏览器访问
 	if isBrowserRequest(c) {
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		c.String(http.StatusNotFound, getHelpHTML())
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.Status(http.StatusNotFound).SendString(getHelpHTML())
 	} else {
-		c.String(http.StatusNotFound, "pdb not exist")
+		return c.Status(http.StatusNotFound).SendString("pdb not exist")
 	}
 }
 
 // isBrowserRequest 检查是否为浏览器请求
-func isBrowserRequest(c *gin.Context) bool {
-	userAgent := c.GetHeader("User-Agent")
-	accept := c.GetHeader("Accept")
+func isBrowserRequest(c *fiber.Ctx) bool {
+	userAgent := c.Get("User-Agent")
+	accept := c.Get("Accept")
 
 	// 检查User-Agent中是否包含常见浏览器标识
 	browserIdentifiers := []string{"Mozilla", "Chrome", "Safari", "Firefox", "Edge", "Opera"}

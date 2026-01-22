@@ -23,6 +23,23 @@ if ! command -v jq &> /dev/null; then
     fi
 fi
 
+# 交互设置端口
+DEFAULT_PORT="9000"
+read -r -p "请输入监听端口(默认${DEFAULT_PORT}): " INPUT_PORT
+if [ -z "$INPUT_PORT" ]; then
+    PORT="$DEFAULT_PORT"
+else
+    PORT="$INPUT_PORT"
+fi
+
+# 默认配置
+PDB_DIR="/opt/pdb"
+PDB_SERVER="https://msdl.microsoft.com/download/symbols"
+SERVER_PORT="0.0.0.0:${PORT}"
+
+# 确保缓存目录存在
+mkdir -p "$PDB_DIR"
+
 # 获取系统架构
 ARCH=$(uname -m)
 case $ARCH in
@@ -107,6 +124,9 @@ After=network.target
 
 [Service]
 Type=simple
+Environment="PDB_DIR=${PDB_DIR}"
+Environment="PDB_SERVER=${PDB_SERVER}"
+Environment="SERVER_PORT=${SERVER_PORT}"
 ExecStart=/usr/bin/pdb-proxy
 Restart=always
 RestartSec=10

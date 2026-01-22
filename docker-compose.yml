@@ -14,7 +14,7 @@ services:
     networks:
       - pdb_proxy
     volumes:
-      - ./pdb:/pdb
+      - ./pdb:/opt/pdb
 
     ports:
       - "9000:9000"
