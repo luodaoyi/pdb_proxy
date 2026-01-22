@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"pdb_proxy/conf"
 	"pdb_proxy/pdb"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -101,229 +102,71 @@ func getHelpHTML() string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDB Proxy Server - 配置说明</title>
+    <title>PDB Proxy</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 300;
-        }
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        .content {
-            padding: 30px;
-        }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #4CAF50;
-        }
-        .section h2 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            margin: 10px 0;
-            overflow-x: auto;
-            position: relative;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        .copy-btn:hover {
-            background: #45a049;
-        }
-        .variable-name {
-            color: #90cdf4;
-            font-weight: bold;
-        }
-        .alert {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #666;
-        }
-        .footer a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-        .footer a:hover {
-            text-decoration: underline;
-        }
-        .current-server {
-            color: #e53e3e;
-            font-weight: bold;
-            font-family: monospace;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 700px; margin: 60px auto; padding: 0 20px; color: #333; line-height: 1.6; }
+        h1 { font-size: 24px; border-bottom: 1px solid #eaeaea; padding-bottom: 20px; margin-bottom: 30px; font-weight: 600; }
+        .card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 30px; }
+        .label { font-size: 14px; color: #666; margin-bottom: 8px; display: block; }
+        .code-area { display: flex; background: #fff; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
+        #symbol-path { flex-grow: 1; padding: 12px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 14px; color: #24292e; overflow-x: auto; white-space: nowrap; line-height: 20px; }
+        .copy-btn { background: #f8f9fa; border: none; border-left: 1px solid #ddd; padding: 0 20px; cursor: pointer; color: #555; font-size: 14px; transition: all 0.2s; white-space: nowrap; }
+        .copy-btn:hover { background: #e9ecef; color: #333; }
+        .copy-btn:active { background: #dde0e3; }
+        .help-text { font-size: 14px; color: #666; }
+        ol { padding-left: 20px; margin: 0; }
+        li { margin-bottom: 8px; }
+        a { color: #0366d6; text-decoration: none; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔧 PDB Proxy Server</h1>
-            <p>Microsoft 符号服务器代理 - 配置说明</p>
-        </div>
-        
-        <div class="content">
-            <div class="section">
-                <h2>📋 环境变量配置</h2>
-                <p>要使用此 PDB 代理服务器，请按以下步骤配置您的环境变量：</p>
-                
-                <div class="alert">
-                    <strong>变量名：</strong> <span class="variable-name">_NT_SYMBOL_PATH</span>
-                </div>
-                
-                <div class="alert success">
-                    <strong>变量值：</strong>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
-                        <div id="symbol-path">srv*C:\Symbols*<span class="current-server"></span>/download/symbols</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>🖥️ Windows 设置步骤</h2>
-                <ol>
-                    <li>右键点击 <strong>此电脑</strong> → <strong>属性</strong></li>
-                    <li>点击 <strong>高级系统设置</strong></li>
-                    <li>点击 <strong>环境变量</strong> 按钮</li>
-                    <li>在 <strong>用户变量</strong> 或 <strong>系统变量</strong> 中点击 <strong>新建</strong></li>
-                    <li>变量名输入：<code>_NT_SYMBOL_PATH</code></li>
-                    <li>变量值输入上面显示的路径</li>
-                    <li>点击 <strong>确定</strong> 保存设置</li>
-                </ol>
-            </div>
-            
-            <div class="section">
-                <h2>💡 使用说明</h2>
-                <ul>
-                    <li><strong>C:\Symbols</strong> - 本地符号缓存目录，可以根据需要修改</li>
-                    <li><strong>srv*</strong> - 表示使用符号服务器缓存模式</li>
-                    <li>配置完成后，调试器会自动从此代理服务器下载符号文件</li>
-                    <li>符号文件会被缓存到本地，提高后续访问速度</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>🛠️ 支持的调试器</h2>
-                <ul>
-                    <li>Visual Studio</li>
-                    <li>WinDbg</li>
-                    <li>x64dbg</li>
-                    <li>OllyDbg</li>
-                    <li>其他支持 Microsoft 符号服务器协议的调试器</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>更多信息访问：<a href="https://github.com/szdyg/pdb_proxy" target="_blank">https://github.com/szdyg/pdb_proxy</a></p>
-            <p>当前服务器地址：<span class="current-server"></span></p>
+    <h1>PDB Proxy Server</h1>
+    
+    <div class="card">
+        <span class="label">Windows 环境变量配置 (_NT_SYMBOL_PATH)</span>
+        <div class="code-area">
+            <div id="symbol-path">srv*C:\Symbols*<span class="current-server"></span>/download/symbols</div>
+            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
         </div>
     </div>
-    
+
+    <div class="help-text">
+        <p><strong>设置步骤：</strong></p>
+        <ol>
+            <li>打开系统属性 → 高级 → 环境变量</li>
+            <li>新建/修改用户变量 <code>_NT_SYMBOL_PATH</code></li>
+            <li>填入上方地址</li>
+            <li>保存生效</li>
+        </ol>
+        <p style="margin-top: 30px; border-top: 1px solid #eaeaea; padding-top: 20px;">
+            项目地址: <a href="https://github.com/szdyg/pdb_proxy" target="_blank">https://github.com/szdyg/pdb_proxy</a>
+        </p>
+    </div>
+
     <script>
-        // 获取当前域名和端口
-        function getCurrentServer() {
-            return window.location.protocol + '//' + window.location.host;
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const server = window.location.protocol + '//' + window.location.host;
+            document.querySelectorAll('.current-server').forEach(el => el.textContent = server);
+        });
         
-        // 更新页面中的服务器地址
-        function updateServerAddress() {
-            const currentServer = getCurrentServer();
-            const elements = document.querySelectorAll('.current-server');
-            elements.forEach(element => {
-                element.textContent = currentServer;
-            });
-        }
-        
-        // 复制到剪贴板
-        function copyToClipboard(button) {
-            const symbolPath = document.getElementById('symbol-path').textContent;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(symbolPath).then(() => {
-                    button.textContent = '已复制!';
-                    setTimeout(() => {
-                        button.textContent = '复制';
-                    }, 2000);
-                });
-            } else {
-                // 降级方案
+        function copyToClipboard(btn) {
+            const text = document.getElementById('symbol-path').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            }).catch(err => {
                 const textArea = document.createElement('textarea');
-                textArea.value = symbolPath;
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                
-                button.textContent = '已复制!';
-                setTimeout(() => {
-                    button.textContent = '复制';
-                }, 2000);
-            }
+                btn.textContent = '已复制';
+                setTimeout(() => btn.textContent = '复制', 2000);
+            });
         }
-        
-        // 页面加载时更新服务器地址
-        document.addEventListener('DOMContentLoaded', updateServerAddress);
     </script>
 </body>
 </html>`

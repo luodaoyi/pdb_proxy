@@ -2,10 +2,7 @@ module pdb_proxy
 
 go 1.22
 
-require (
-	github.com/gin-gonic/gin v1.10.0
-	gopkg.in/ini.v1 v1.67.0
-)
+require github.com/gin-gonic/gin v1.10.0
 
 require (
 	github.com/bytedance/sonic v1.11.9 // indirect
