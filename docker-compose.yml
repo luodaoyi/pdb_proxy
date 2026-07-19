@@ -10,6 +10,7 @@ services:
     environment:
       - TIME_ZONE=Asia/Shanghai
       - PDB_SERVER=https://msdl.microsoft.com/download/symbols
+      - PDB_CACHE_TTL=${PDB_CACHE_TTL:-1h}
     restart: always
     networks:
       - pdb_proxy

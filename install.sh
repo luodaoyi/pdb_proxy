@@ -56,6 +56,7 @@ fi
 # 默认配置
 PDB_DIR="/opt/pdb"
 PDB_SERVER="https://msdl.microsoft.com/download/symbols"
+PDB_CACHE_TTL="${PDB_CACHE_TTL:-1h}"
 SERVER_PORT="0.0.0.0:${PORT}"
 
 # 确保缓存目录存在
@@ -158,6 +159,7 @@ After=network.target
 Type=simple
 Environment="PDB_DIR=${PDB_DIR}"
 Environment="PDB_SERVER=${PDB_SERVER}"
+Environment="PDB_CACHE_TTL=${PDB_CACHE_TTL}"
 Environment="SERVER_PORT=${SERVER_PORT}"
 ExecStart=/usr/bin/pdb-proxy
 Restart=always

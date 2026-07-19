@@ -44,12 +44,20 @@ func printStartupInfo() {
 	fmt.Printf("⏰ 启动时间: %s\n", time.Now().Format("2006-01-02 15:04:05"))
 	fmt.Printf("🌐 监听地址: %s\n", conf.ServerPort)
 	fmt.Printf("📁 PDB 缓存目录: %s\n", conf.PdbDir)
+	fmt.Printf("⏱️ PDB 缓存 TTL: %s\n", formatCacheTTL(conf.PdbCacheTTL))
 	fmt.Printf("🔗 上游服务器: %s\n", conf.PdbServer)
 	fmt.Println("📋 可用端点:")
 	fmt.Println("   GET  /                                    - 配置说明页面")
 	fmt.Println("   GET  /download/symbols/{name}/{hash}/{name} - PDB文件下载")
 	fmt.Println(strings.Repeat("-", 60))
 	fmt.Println("�� 正在启动服务器...")
+}
+
+func formatCacheTTL(ttl time.Duration) string {
+	if ttl == 0 {
+		return "永久"
+	}
+	return ttl.String()
 }
 
 // handleRootAccess 处理根路径访问
